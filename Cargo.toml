@@ -1,0 +1,7 @@
+[package]
+name = "rstvnamer"
+version = "0.1.0"
+authors = ["dbr"]
+
+[dependencies]
+regex = "0.1.8"
