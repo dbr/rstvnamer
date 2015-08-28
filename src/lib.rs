@@ -3,6 +3,7 @@ use regex::Regex;
 
 mod test;
 
+/// Used for air-date of an episode etc
 #[derive(Debug)]
 pub struct Date {
     year: i32,
@@ -10,12 +11,17 @@ pub struct Date {
     day: i32,
 }
 
+
+/// Episode information prased from a filename.
 #[derive(Debug)]
 pub enum ParsedFile{
     DateBased{series: String, date: Date},
     SeasonBased{series: String, season: i32, episode: i32},
 }
 
+
+/// Episode with complete set of information, usually expanded from a
+/// ParsedFile instance
 #[derive(Debug)]
 pub struct PopulatedFile {
     seriesname: String,
@@ -25,6 +31,8 @@ pub struct PopulatedFile {
     airdate: Date,
 }
 
+
+/// Errors in contacting TheTVDB
 #[derive(Debug)]
 pub enum TvdbError {
     SeriesNotFound,
@@ -32,7 +40,8 @@ pub enum TvdbError {
 }
 
 
-
+/// Takes a ParsedFile, locates additional information (episode name
+/// etc) and returns a complete PopulatedFile instance
 pub fn populate(f: ParsedFile) -> Result<PopulatedFile, TvdbError> {
     return match f {
         ParsedFile::DateBased{..} => 
@@ -42,6 +51,8 @@ pub fn populate(f: ParsedFile) -> Result<PopulatedFile, TvdbError> {
     }
 }
 
+
+/// Parses a filename and returns a ParsedFile
 pub fn parse(fname:&str) -> Option<ParsedFile>{
     let x = Regex::new(r"([a-zA-Z0-9]+)\.s(\d{2})e(\d{2})").unwrap();
 
