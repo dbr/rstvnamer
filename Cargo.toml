@@ -5,6 +5,7 @@ authors = ["dbr"]
 
 [dependencies]
 regex = "0.1.8"
+hyper = "0.6.11"
 
 [lib]
 name = "rstvnamer"
