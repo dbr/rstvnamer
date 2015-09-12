@@ -304,9 +304,8 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
 
     for pat in patterns.iter(){
         if let Some(x) = pat.captures(fname) {
-            //if x.name("seriesname").is_some() && x.name("seasonnumber").is_some() && x.name("episodenumber").is_some() {
+
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
-                println!("Matched thing");
                 return Some(ParsedFile::Season(SeasonBased{
                     series: x.name("seriesname").unwrap().to_owned(),
                     season: intify(x.name("seasonnumber").unwrap()),
