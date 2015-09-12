@@ -12,6 +12,7 @@ pub struct Date {
 
 
 // Loads other files
+mod config;
 mod parsing;
 mod populate;
 mod tvdb;
