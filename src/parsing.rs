@@ -296,6 +296,10 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
         return matches;
     }
 
+    fn intify(instr: &str) -> i32{
+        instr.to_owned().parse::<i32>().unwrap()
+    }
+
     let patterns = load_patterns();
 
     for pat in patterns.iter(){
@@ -305,18 +309,20 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
                 println!("Matched thing");
                 return Some(ParsedFile::Season(SeasonBased{
                     series: x.name("seriesname").unwrap().to_owned(),
-                    season: x.name("seasonnumber").unwrap().to_owned().parse::<i32>().unwrap(),
-                    episode: x.name("episodenumber").unwrap().to_owned().parse::<i32>().unwrap(),
+                    season: intify(x.name("seasonnumber").unwrap()),
+                    episode: intify(x.name("episodenumber").unwrap()),
                 }));
+
             } else if check_matches(&x, vec!["seriesname", "year", "month", "day"]) {
                 return Some(ParsedFile::Date(DateBased{
                     series: x.name("seriesname").unwrap().to_owned(),
                     date: Date{
-                        year: x.name("year").unwrap().to_owned().parse::<i32>().unwrap(),
-                        month: x.name("month").unwrap().to_owned().parse::<i32>().unwrap(),
-                        day: x.name("day").unwrap().to_owned().parse::<i32>().unwrap(),
+                        year: intify(x.name("year").unwrap()),
+                        month: intify(x.name("month").unwrap()),
+                        day: intify(x.name("day").unwrap()),
                     },
                 }));
+
             } else {
                 let mut names: Vec<String> = vec![];
                 for (name, _) in x.iter_named(){
