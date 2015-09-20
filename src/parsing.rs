@@ -286,7 +286,8 @@ fn load_patterns() -> Vec<Regex>{
 
 /// Parses a filename and returns a ParsedFile
 pub fn parse(fname:&str) -> Option<ParsedFile>{
-    fn check_matches(cap: &regex::Captures, things: Vec<&'static str>) -> bool{
+    /// Check a regex contains all specified named captures
+    fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool{
         let mut matches = true;
         for name in things.iter(){
             if cap.name(name).is_none(){
@@ -296,10 +297,13 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
         return matches;
     }
 
+    /// Turns "123" into 123
     fn intify(instr: &str) -> i32{
+        // TODO: Better error handling
         instr.to_owned().parse::<i32>().unwrap()
     }
 
+    // Load all regex patterns
     let patterns = load_patterns();
 
     for pat in patterns.iter(){
@@ -323,6 +327,7 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
                 }));
 
             } else {
+                // Unhandled capture groups, throw error
                 let mut names: Vec<String> = vec![];
                 for (name, _) in x.iter_named(){
                     names.push(name.to_owned());
