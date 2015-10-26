@@ -22,27 +22,7 @@ pub struct PopulatedFile {
 
 
 fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
-    let client = Client::new();
-
-    let formatted_url = format!("http://thetvdb.com/api/GetSeries.php?seriesname={}", file.series);
-    let url = Url::parse(&formatted_url).ok().expect("invalid URL");
-    println!("Getting {}", url);
-
-    let mut res = client.get(url)
-        // set a header
-        .header(Connection::close())
-        // let 'er go!
-        .send();
-
-    let mut res = match res {
-        Err(e) => return Err(TvdbError::CommunicationError{reason: "Error contacting TVDB".to_owned()}), // FIXME: http://stackoverflow.com/questions/28911833/error-handling-best-practices
-        Ok(r) => r
-    };
-
-    // Read the Response.
-    let mut body = String::new();
-    res.read_to_string(&mut body).unwrap();
-    //println!("{}", body);
+    let sr = try!(super::tvdb::series_search("scrubs", super::tvdb::ConsoleInput::new()));
 
     let pf = PopulatedFile {
         seriesname: file.series,

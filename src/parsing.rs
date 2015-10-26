@@ -1,6 +1,8 @@
-use super::Date;
 use regex::Regex;
 use regex;
+
+use super::Date;
+use super::utils::intify;
 
 
 
@@ -295,12 +297,6 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
             }
         }
         return matches;
-    }
-
-    /// Turns "123" into 123
-    fn intify(instr: &str) -> i32{
-        // TODO: Better error handling
-        instr.to_owned().parse::<i32>().unwrap()
     }
 
     // Load all regex patterns

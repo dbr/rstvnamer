@@ -6,6 +6,7 @@ authors = ["dbr"]
 [dependencies]
 regex = "0.1.8"
 hyper = "0.6.11"
+xmltree = "0.2.1"
 
 [lib]
 name = "rstvnamer"
