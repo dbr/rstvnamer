@@ -41,12 +41,12 @@ impl ConsoleInput{
 }
 
 pub trait SeriesSelector {
-    fn select(self, results: Vec<SeriesSearchResult>) -> SeriesSearchResult;
+    fn select(self, results: &Vec<SeriesSearchResult>) -> SeriesSearchResult;
 }
+
 impl SeriesSelector for ConsoleInput{
-    fn select(self, results: Vec<SeriesSearchResult>) -> SeriesSearchResult{
-        println!("{:?}", results);
-        return results[0].clone(); // FIXME: Nope
+    fn select(self, results: &Vec<SeriesSearchResult>) -> SeriesSearchResult{
+        return results[0].clone();
     }
 }
 
@@ -85,7 +85,6 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
             }
         }
 
-        println!("{:?}", child);
         let r = SeriesSearchResult{
             id:         intify(&get_text(child, "id").unwrap()),
             seriesname: get_text(child, "SeriesName").expect("Missing SeriesName"),
@@ -101,6 +100,6 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
         results.push(r);
     }
 
-    selector.select(results);
-    return Err(TvdbError::SeriesNotFound);
+    return Ok(selector.select(&results));
+    //return Err(TvdbError::SeriesNotFound);
 }
