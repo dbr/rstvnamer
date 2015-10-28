@@ -1,8 +1,5 @@
 extern crate xmltree;
 
-use std::{io, error};
-use std::io::Cursor;
-
 use hyper::Client;
 use hyper::header::Connection;
 use std::io::Read;
@@ -59,7 +56,7 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
     let url = Url::parse(&formatted_url).ok().expect("invalid URL");
     println!("Getting {}", url);
 
-    let mut res = client.get(url)
+    let res = client.get(url)
         .header(Connection::close())
         .send();
 
@@ -101,6 +98,10 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
         };
 
         results.push(r);
+    }
+
+    if results.is_empty(){
+        return Err(TvdbError::SeriesNotFound);
     }
 
     // Select UI

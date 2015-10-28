@@ -1,11 +1,5 @@
 use super::Date;
 
-use hyper::Client;
-use hyper::header::Connection;
-use std::io::Read;
-
-use hyper::Url;
-
 use super::parsing::*;
 use super::tvdb::*;
 
