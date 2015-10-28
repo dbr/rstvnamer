@@ -10,7 +10,10 @@ fn main(){
         if let Some(p) = parsed {
             println!("Parsed '{}' -> {:?}", fname, p);
             let pop = rstvnamer::populate(p);
-            println!("Populated: {:?}", pop);
+            match pop {
+                Ok(p) => println!("Success: {:?}", p),
+                Err(e) => println!("Error! {:?}", e),
+            }
         } else {
             println!("Failed to parse {}", fname);
         }

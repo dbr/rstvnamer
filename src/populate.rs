@@ -21,11 +21,11 @@ pub struct PopulatedFile {
 }
 
 
-fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
-    let sr = try!(super::tvdb::series_search("scrubs", super::tvdb::ConsoleInput::new()));
+fn _populate_seasonbased<T: SeriesSelector>(file: SeasonBased, ui: T) -> Result<PopulatedFile, TvdbError>{
+    let sr = try!(super::tvdb::series_search("scrubs", ui));
 
     let pf = PopulatedFile {
-        seriesname: file.series,
+        seriesname: sr.seriesname,
         season: file.season,
         episode: file.episode,
         episodename: "hi".to_string(),
@@ -35,15 +35,17 @@ fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
     return Ok(pf);
 }
 
-fn _populate_datebased(file: DateBased) -> Result<PopulatedFile, TvdbError>{
+fn _populate_datebased<T: SeriesSelector>(file: DateBased, ui: T) -> Result<PopulatedFile, TvdbError>{
     Err(TvdbError::CommunicationError{reason: "Because testing".to_string()})
 }
 
 /// Takes a ParsedFile, locates additional information (episode name
 /// etc) and returns a complete PopulatedFile instance
 pub fn populate(f: ParsedFile) -> Result<PopulatedFile, TvdbError> {
+    let ui = super::tvdb::ConsoleInput::new();
+
     return match f {
-        ParsedFile::Date(x) => return _populate_datebased(x),
-        ParsedFile::Season(x) => return _populate_seasonbased(x),
+        ParsedFile::Date(x) => return _populate_datebased(x, ui),
+        ParsedFile::Season(x) => return _populate_seasonbased(x, ui),
     }
 }

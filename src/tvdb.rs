@@ -17,19 +17,21 @@ use super::utils::intify;
 pub enum TvdbError {
     SeriesNotFound,
     CommunicationError{reason: String},
+    DataError{reason: String},
+    Cancelled,
 }
 
 #[derive(Debug,Clone)]
 pub struct SeriesSearchResult{
-    id: i32, // TODO: Is this any different to seriesid?
-    seriesname: String,
-    language: String,
-    overview: Option<String>,
-    banner: Option<String>,
-    imdb_id: Option<String>,
-    //firstaired: Date,
-    network: Option<String>,
-    zap2it_id: Option<String>,
+    pub id: i32, // TODO: Is this any different to seriesid?
+    pub seriesname: String,
+    pub language: String,
+    pub overview: Option<String>,
+    pub banner: Option<String>,
+    pub imdb_id: Option<String>,
+    //pub firstaired: Date,
+    pub network: Option<String>,
+    pub zap2it_id: Option<String>,
 }
 
 
@@ -41,12 +43,12 @@ impl ConsoleInput{
 }
 
 pub trait SeriesSelector {
-    fn select(self, results: &Vec<SeriesSearchResult>) -> SeriesSearchResult;
+    fn select(self, results: &Vec<SeriesSearchResult>) -> Option<SeriesSearchResult>;
 }
 
 impl SeriesSelector for ConsoleInput{
-    fn select(self, results: &Vec<SeriesSearchResult>) -> SeriesSearchResult{
-        return results[0].clone();
+    fn select(self, results: &Vec<SeriesSearchResult>) -> Option<SeriesSearchResult>{
+        return Some(results[0].clone());
     }
 }
 
@@ -69,11 +71,11 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
     // Read the Response.
     let mut body = String::new();
     res.read_to_string(&mut body).unwrap();
-    //println!("{}", body);
 
+    // Parse XML
     let tree = xmltree::Element::parse(body.as_bytes());
 
-
+    // Convert XML into structs
     let mut results : Vec<SeriesSearchResult> = vec![];
 
     for child in tree.children.iter(){
@@ -85,10 +87,11 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
             }
         }
 
+        //try!(get_text(child, "bannana").ok_or(TvdbError::DataError{reason: "No child 'blah' found".to_owned()}));
         let r = SeriesSearchResult{
-            id:         intify(&get_text(child, "id").unwrap()),
-            seriesname: get_text(child, "SeriesName").expect("Missing SeriesName"),
-            language:   get_text(child, "language").expect("Missing language"),
+            id:         intify(&get_text(child, "id").expect("Search result XML missing 'id' element")),
+            seriesname: get_text(child, "SeriesName").expect("Search result XML Missing 'SeriesName' element"),
+            language:   get_text(child, "language").expect("Search result XML missing 'language' element"),
             overview:   get_text(child, "Overview"),
             banner:     get_text(child, "banner"),
             imdb_id:    get_text(child, "IMDB_ID"),
@@ -100,6 +103,6 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
         results.push(r);
     }
 
-    return Ok(selector.select(&results));
-    //return Err(TvdbError::SeriesNotFound);
+    // Select UI
+    return selector.select(&results).ok_or(TvdbError::Cancelled);
 }
