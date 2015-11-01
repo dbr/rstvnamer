@@ -78,10 +78,7 @@ pub fn series_search<T: SeriesSelector>(series: &str, selector: T) -> Result<Ser
     for child in tree.children.iter(){
 
         fn get_text(child: &xmltree::Element, x: &str) -> Option<String>{
-            return match child.get_child(x) {
-                Some(id_child) => Some(id_child.text.clone().unwrap_or("".to_owned())),
-                None => None,
-            }
+            child.get_child(x).and_then(|id_child| id_child.text.clone())
         }
 
         //try!(get_text(child, "bannana").ok_or(TvdbError::DataError{reason: "No child 'blah' found".to_owned()}));
