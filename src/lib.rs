@@ -16,7 +16,7 @@ mod utils;
 mod config;
 mod parsing;
 mod populate;
-mod tvdb;
+pub mod tvdb;
 
 // Reexport public interface
 pub use parsing::parse;

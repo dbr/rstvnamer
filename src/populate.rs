@@ -1,7 +1,7 @@
 use super::Date;
 
-use super::parsing::*;
-use super::tvdb::*;
+use super::parsing::{SeasonBased, DateBased, ParsedFile};
+use super::tvdb::{TvdbError, SeriesSelector};
 
 /// Episode with complete set of information, usually expanded from a
 /// ParsedFile instance
@@ -35,9 +35,7 @@ fn _populate_datebased<T: SeriesSelector>(file: DateBased, ui: T) -> Result<Popu
 
 /// Takes a ParsedFile, locates additional information (episode name
 /// etc) and returns a complete PopulatedFile instance
-pub fn populate(f: ParsedFile) -> Result<PopulatedFile, TvdbError> {
-    let ui = super::tvdb::ConsoleInput::new();
-
+pub fn populate<T: SeriesSelector>(f: ParsedFile, ui: T) -> Result<PopulatedFile, TvdbError> {
     return match f {
         ParsedFile::Date(x) => return _populate_datebased(x, ui),
         ParsedFile::Season(x) => return _populate_seasonbased(x, ui),

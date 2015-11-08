@@ -32,24 +32,12 @@ pub struct SeriesSearchResult{
 }
 
 
-pub struct ConsoleInput;
-impl ConsoleInput{
-    pub fn new() -> ConsoleInput{
-        ConsoleInput
-    }
-}
-
 pub trait SeriesSelector {
     fn select(self, results: &Vec<SeriesSearchResult>) -> Option<SeriesSearchResult>;
 }
 
-impl SeriesSelector for ConsoleInput{
-    fn select(self, results: &Vec<SeriesSearchResult>) -> Option<SeriesSearchResult>{
-        return Some(results[0].clone());
-    }
-}
 
-struct SeriesSearch<T> {
+pub struct SeriesSearch<T: SeriesSelector> {
     series: String,
     ui: Option<T>,
 }
