@@ -1,5 +1,5 @@
 extern crate regex;
-extern crate hyper;
+extern crate tvdb;
 
 
 /// Used for air-date of an episode etc
@@ -12,11 +12,10 @@ pub struct Date {
 
 
 // Loads other files
-mod utils;
-mod config;
-mod parsing;
-mod populate;
-pub mod tvdb;
+pub mod utils;
+pub mod config;
+pub mod parsing;
+pub mod populate;
 
 // Reexport public interface
 pub use parsing::parse;
