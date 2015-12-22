@@ -2,11 +2,13 @@ extern crate rstvnamer;
 
 #[test]
 fn test_parsing(){
-    let f = rstvnamer::parse("scrubs.s01e12");
-    assert!(f.is_some());
+    let f = rstvnamer::parse("scrubs.s01e12").expect("Failed to parse");
 
-    match f.unwrap() {
-        rstvnamer::ParsedFile::Season(x) => assert!(x.series == "scrubs"),
-        _ => assert!(false),
+    if let rstvnamer::parsing::ParsedFile::Season(x) = f {
+        assert!(x.series == "scrubs");
+        assert!(x.season == 1);
+        assert!(x.episode == 12);
+    } else {
+        panic!("Wrong parsed file type {:?}", f)
     }
 }
