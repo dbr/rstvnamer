@@ -1,5 +1,5 @@
 /// Turns "123" into 123
-pub fn intify(instr: &str) -> i32{
+pub fn intify(instr: &str) -> u32{
     // TODO: Better error handling
-    instr.to_owned().parse::<i32>().unwrap()
+    instr.to_owned().parse::<u32>().unwrap()
 }

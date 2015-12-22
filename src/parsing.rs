@@ -1,7 +1,7 @@
 use regex::Regex;
 use regex;
 
-use super::Date;
+use tvdb::Date;
 use super::utils::intify;
 
 
@@ -16,8 +16,8 @@ pub struct DateBased{
 #[derive(Debug)]
 pub struct SeasonBased{
     pub series: String,
-    pub season: i32,
-    pub episode: i32
+    pub season: u32,
+    pub episode: u32
 }
 
 #[derive(Debug)]

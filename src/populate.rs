@@ -1,7 +1,7 @@
 extern crate tvdb;
-use super::Date;
 use super::parsing::{SeasonBased, DateBased, ParsedFile};
 
+use tvdb::Date;
 use tvdb::TvdbError;
 
 /// Episode with complete set of information, usually expanded from a
@@ -9,8 +9,8 @@ use tvdb::TvdbError;
 #[derive(Debug)]
 pub struct PopulatedFile {
     pub series: String,
-    pub season: i32,
-    pub episode: i32,
+    pub season: u32,
+    pub episode: u32,
     pub episodename: String,
     pub airdate: Date,
 }
@@ -23,14 +23,15 @@ fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
         return Err(TvdbError::SeriesNotFound);
     }
 
-    let sr = sr[0].clone();
+    let ep = try!(api.episode(&sr[0], file.season, file.episode));
+    let sn = sr[0].seriesname.clone();
 
     let pf = PopulatedFile {
-        series: sr.seriesname,
+        series: sn,
         season: file.season,
         episode: file.episode,
-        episodename: "FIXME".to_string(),
-        airdate: Date{year: 2014, month: 12, day: 2},
+        episodename: ep.episodename,
+        airdate: ep.firstaired.unwrap(),
     };
 
     return Ok(pf);
