@@ -2,7 +2,7 @@ extern crate tvdb;
 use super::parsing::{SeasonBased, DateBased, ParsedFile};
 
 use tvdb::Date;
-use tvdb::TvdbError;
+use tvdb::{TvdbError, TvdbResult};
 
 /// Episode with complete set of information, usually expanded from a
 /// ParsedFile instance
@@ -16,9 +16,9 @@ pub struct PopulatedFile {
 }
 
 
-fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
+fn _populate_seasonbased(file: SeasonBased) -> TvdbResult<PopulatedFile>{
     let api = tvdb::Tvdb::new("0629B785CE550C8D");
-    let sr = try!(api.search(file.series, "en".to_owned()));
+    let sr = try!(api.search(&file.series, "en"));
     if sr.len() == 0 {
         return Err(TvdbError::SeriesNotFound);
     }
@@ -30,20 +30,20 @@ fn _populate_seasonbased(file: SeasonBased) -> Result<PopulatedFile, TvdbError>{
         series: sn,
         season: file.season,
         episode: file.episode,
-        episodename: ep.episodename,
-        airdate: ep.firstaired.unwrap(),
+        episodename: ep.episode_name,
+        airdate: ep.first_aired.unwrap(),
     };
 
     return Ok(pf);
 }
 
-fn _populate_datebased(file: DateBased) -> Result<PopulatedFile, TvdbError>{
+fn _populate_datebased(file: DateBased) -> TvdbResult<PopulatedFile>{
     Err(TvdbError::CommunicationError{reason: "Because testing".to_string()})
 }
 
 /// Takes a ParsedFile, locates additional information (episode name
 /// etc) and returns a complete PopulatedFile instance
-pub fn populate(f: ParsedFile) -> Result<PopulatedFile, TvdbError> {
+pub fn populate(f: ParsedFile) -> TvdbResult<PopulatedFile> {
     return match f {
         ParsedFile::Date(x) => return _populate_datebased(x),
         ParsedFile::Season(x) => return _populate_seasonbased(x),
