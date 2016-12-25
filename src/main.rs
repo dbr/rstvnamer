@@ -1,22 +1,6 @@
 extern crate rstvnamer;
 use std::fmt;
 
-/*
-struct ConsoleInput;
-impl<'a> ConsoleInput{
-    pub fn new() -> ConsoleInput {
-        ConsoleInput
-    }
-}
-
-
-impl<'a> SeriesSelector for &'a ConsoleInput{
-    fn select(self, results: &Vec<SeriesSearchResult>) -> Option<SeriesSearchResult> {
-        return Some(results[0].clone());
-    }
-}
-*/
-
 #[derive(Debug)]
 pub enum TvnamerError {
     ParseError{reason: String},
