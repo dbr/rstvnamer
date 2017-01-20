@@ -27,7 +27,7 @@ pub enum ParsedFile{
     Season(SeasonBased),
 }
 
-fn load_patterns() -> Vec<Regex>{
+fn load_patterns() -> TvnamerResult<Vec<Regex>>{
     let raw_patterns = vec![
         // r"(?x) # [group] Show - 01-02 [crc]
         // ^\[(?P<group>.+?)\][ ]?               # group name, captured for [#100]
@@ -279,12 +279,13 @@ fn load_patterns() -> Vec<Regex>{
         let comp = Regex::new(pat);
         match comp {
             Ok(x) => patterns.push(x),
-            Err(e) => panic!("Regex error: {}\n  Pattern:\n{}", e, pat),
+            Err(e) => return Err(TvnamerError::InternalError{
+                reason: format!("Error compiling regex: {}\n  Pattern:\n{}", e, pat)}),
         }
 
     }
 
-    return patterns;
+    return Ok(patterns);
 }
 
 /// Parses a filename and returns a ParsedFile
@@ -301,7 +302,7 @@ pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
     }
 
     // Load all regex patterns
-    let patterns = load_patterns();
+    let patterns = try!(load_patterns());
 
     for pat in patterns.iter(){
         if let Some(x) = pat.captures(fname) {

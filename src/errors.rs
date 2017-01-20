@@ -6,6 +6,7 @@ use tvdb::TvdbError;
 pub enum TvnamerError {
     ParseError{reason: String},
     TvdbError{original: super::TvdbError},
+    InternalError{reason: String},
     MiscError,
 }
 
@@ -16,8 +17,9 @@ pub type TvnamerResult<T> = Result<T, TvnamerError>;
 impl fmt::Display for TvnamerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            TvnamerError::ParseError{reason: ref e} => write!(f, "Internal error: {}", e),
+            TvnamerError::ParseError{reason: ref e} => write!(f, "{}", e),
             TvnamerError::TvdbError{original: ref e} => write!(f, "{}", e),
+            TvnamerError::InternalError{reason: ref e} => write!(f, "Internal error: {}", e),
             TvnamerError::MiscError => write!(f, "Misc error"),
         }
     }
