@@ -28,12 +28,33 @@ impl From<rstvnamer::TvdbError> for TvnamerError{
     }
 }
 
-fn rename_one(fname: &str) -> Result<(), TvnamerError>{
+fn process_one(fname: &str) -> Result<(), TvnamerError>{
     let parsed = try!(rstvnamer::parse(fname).ok_or(TvnamerError::ParseError{reason: "Failed to parse".into()}));
     let populated = try!(rstvnamer::populate(parsed));
     let formatted = try!(rstvnamer::format(populated));
     println!("{} -> {:?}", fname, formatted);
+    let act = Action::new(fname.into(), formatted);
     return Ok(());
+}
+
+enum ActionModes{
+    Copy,
+    Move,
+    Symlink,
+}
+
+struct Action{
+    mode: ActionModes,
+    orig_filepath: String,
+}
+
+impl Action{
+    fn new(orig_filepath: String, new_name: String) -> Action {
+        Action{
+            mode: ActionModes::Copy,
+            orig_filepath: orig_filepath,
+        }
+    }
 }
 
 #[cfg(not(test))]
@@ -41,7 +62,7 @@ fn rename_one(fname: &str) -> Result<(), TvnamerError>{
 fn main(){
     let filenames = vec!["scrubs.s01e22.avi", "the.simpsons.2004.01.12.avi"];
     for fname in filenames.iter(){
-        match rename_one(fname) {
+        match process_one(fname) {
             Ok(_) => (),
             Err(e) => println!("Error renaming {}: {}", fname, e),
         };
