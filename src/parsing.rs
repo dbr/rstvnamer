@@ -3,6 +3,7 @@ use regex;
 
 use tvdb::Date;
 use super::utils::intify;
+use super::{TvnamerError, TvnamerResult};
 
 
 
@@ -280,14 +281,14 @@ fn load_patterns() -> Vec<Regex>{
             Ok(x) => patterns.push(x),
             Err(e) => panic!("Regex error: {}\n  Pattern:\n{}", e, pat),
         }
-        
+
     }
 
     return patterns;
 }
 
 /// Parses a filename and returns a ParsedFile
-pub fn parse(fname:&str) -> Option<ParsedFile>{
+pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
     /// Check a regex contains all specified named captures
     fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool{
         let mut matches = true;
@@ -306,14 +307,14 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
         if let Some(x) = pat.captures(fname) {
 
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
-                return Some(ParsedFile::Season(SeasonBased{
+                return Ok(ParsedFile::Season(SeasonBased{
                     series: x.name("seriesname").unwrap().to_owned(),
                     season: intify(x.name("seasonnumber").unwrap()),
                     episode: intify(x.name("episodenumber").unwrap()),
                 }));
 
             } else if check_matches(&x, vec!["seriesname", "year", "month", "day"]) {
-                return Some(ParsedFile::Date(DateBased{
+                return Ok(ParsedFile::Date(DateBased{
                     series: x.name("seriesname").unwrap().to_owned(),
                     date: Date{
                         year: intify(x.name("year").unwrap()),
@@ -328,10 +329,12 @@ pub fn parse(fname:&str) -> Option<ParsedFile>{
                 for (name, _) in x.iter_named(){
                     names.push(name.to_owned());
                 }
-                panic!("WARNING: Unhandled capture groups {:?}", names);
+                return Err(TvnamerError::ParseError{reason:
+                    format!("Unhandled capture groups {:?} in pattern {}", names, pat)});
             }
         }
     }
 
-    return None;
+    return Err(TvnamerError::ParseError{reason:
+        format!("Unrecognised file name {} matched no patterns", fname)});
 }

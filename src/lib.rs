@@ -7,6 +7,10 @@ pub mod config;
 pub mod parsing;
 pub mod populate;
 pub mod format;
+pub mod errors;
+
+pub use errors::TvnamerError;
+pub use errors::TvnamerResult;
 
 // Reexport public interface
 pub use tvdb::TvdbResult;
