@@ -1,6 +1,8 @@
 extern crate rstvnamer;
 use rstvnamer::{TvnamerError, TvnamerResult};
 
+use std::path::Path;
+
 
 enum ActionModes{
     Copy,
@@ -31,9 +33,20 @@ impl Action{
     }
 }
 
-fn process_one(fname: &str) -> Result<(), TvnamerError>{
+fn process_one(path: &str) -> Result<(), TvnamerError>{
+    let fname = Path::new(path).file_stem()
+        .ok_or(TvnamerError::InternalError{
+            reason: format!("No file name found for path {}", path)})?
+            .to_str().ok_or(TvnamerError::InternalError{
+                reason: "Failed to convert to string".into()})?;
+    println!("{}", fname);
+
     let parsed = try!(rstvnamer::parse(fname));
+    println!("{:?}", parsed);
+
     let populated = try!(rstvnamer::populate(parsed));
+    println!("{:?}", populated);
+
     let formatted = try!(rstvnamer::format(populated));
     println!("{} -> {:?}", fname, formatted);
     let act = Action::new(fname.into(), formatted);
@@ -44,8 +57,6 @@ fn process_one(fname: &str) -> Result<(), TvnamerError>{
 #[cfg(not(test))]
 #[cfg(not(doc))]
 fn main(){
-    //let filenames = vec!["scrubs.s01e22.avi", "the.simpsons.2004.01.12.avi"];
-    //for fname in filenames.iter(){
     for fname in std::env::args().skip(1) {
         match process_one(&fname) {
             Ok(_) => (),

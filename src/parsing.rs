@@ -288,6 +288,10 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
     return Ok(patterns);
 }
 
+fn clean_series(name: String) -> String {
+    name.replace(".", " ")
+}
+
 /// Parses a filename and returns a ParsedFile
 pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
     /// Check a regex contains all specified named captures
@@ -309,14 +313,14 @@ pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
 
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
                 return Ok(ParsedFile::Season(SeasonBased{
-                    series: x.name("seriesname").unwrap().to_owned(),
+                    series: clean_series(x.name("seriesname").unwrap().to_owned()),
                     season: intify(x.name("seasonnumber").unwrap()),
                     episode: intify(x.name("episodenumber").unwrap()),
                 }));
 
             } else if check_matches(&x, vec!["seriesname", "year", "month", "day"]) {
                 return Ok(ParsedFile::Date(DateBased{
-                    series: x.name("seriesname").unwrap().to_owned(),
+                    series: clean_series(x.name("seriesname").unwrap().to_owned()),
                     date: Date{
                         year: intify(x.name("year").unwrap()),
                         month: intify(x.name("month").unwrap()),
