@@ -1,5 +1,6 @@
 use regex::Regex;
 use regex;
+use std::path::Path;
 
 use tvdb::Date;
 use super::utils::intify;
@@ -293,7 +294,7 @@ fn clean_series(name: String) -> String {
 }
 
 /// Parses a filename and returns a ParsedFile
-pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
+pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
     /// Check a regex contains all specified named captures
     fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool{
         let mut matches = true;
@@ -308,8 +309,14 @@ pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
     // Load all regex patterns
     let patterns = try!(load_patterns());
 
+    let basename = Path::new(fname).file_stem()
+        .ok_or(TvnamerError::InternalError{
+            reason: format!("No file name found for path {:?}", fname)})?
+            .to_str().ok_or(TvnamerError::InternalError{
+                reason: "Failed to convert to string".into()})?;
+
     for pat in patterns.iter(){
-        if let Some(x) = pat.captures(fname) {
+        if let Some(x) = pat.captures(basename) {
 
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
                 return Ok(ParsedFile::Season(SeasonBased{
@@ -340,6 +347,7 @@ pub fn parse(fname:&str) -> TvnamerResult<ParsedFile>{
         }
     }
 
+    // TODO: Patterns which match against full path
     return Err(TvnamerError::ParseError{reason:
-        format!("Unrecognised file name {} matched no patterns", fname)});
+        format!("Unrecognised file name {} matched no patterns", basename)});
 }
