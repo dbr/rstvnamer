@@ -8,6 +8,7 @@ pub mod parsing;
 pub mod populate;
 pub mod format;
 pub mod errors;
+pub mod actions;
 
 pub use errors::TvnamerError;
 pub use errors::TvnamerResult;
@@ -18,3 +19,5 @@ pub use tvdb::TvdbError;
 pub use parsing::parse;
 pub use populate::populate;
 pub use format::format;
+pub use actions::Action;
+pub use actions::ActionModes;
