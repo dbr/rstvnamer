@@ -1,10 +1,12 @@
 extern crate rstvnamer;
+use std::path::PathBuf;
 
 #[test]
 fn test_parsing(){
-    let f = rstvnamer::parse("scrubs.s01e12").expect("Failed to parse");
+    let path = PathBuf::from("scrubs.s01e12.avi");
+    let f = rstvnamer::parse(&path).expect("Failed to parse");
 
-    if let rstvnamer::parsing::ParsedFile::Season(x) = f {
+    if let rstvnamer::ParsedFile::Season(x) = f {
         assert!(x.series == "scrubs");
         assert!(x.season == 1);
         assert!(x.episode == 12);
