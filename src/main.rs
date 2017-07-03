@@ -1,9 +1,9 @@
 extern crate rstvnamer;
 use rstvnamer::{TvnamerError, TvnamerResult};
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-fn process_one(path: &Path) -> Result<(), TvnamerError>{
+fn process_one(path: &Path) -> TvnamerResult<PathBuf>{
     let parsed = try!(rstvnamer::parse(path));
     println!("{:?}", parsed);
 
@@ -14,8 +14,7 @@ fn process_one(path: &Path) -> Result<(), TvnamerError>{
     println!("{:?} formats into {:?}", populated, formatted);
 
     let act = rstvnamer::Action::new(&path, formatted, rstvnamer::ActionModes::Symlink);
-    act.perform();
-    return Ok(());
+    return act.perform();
 }
 
 #[cfg(not(test))]

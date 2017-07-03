@@ -1,4 +1,6 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use super::{TvnamerError, TvnamerResult};
+
 
 /// Different operations to perform with the new name
 pub enum ActionModes{
@@ -7,6 +9,7 @@ pub enum ActionModes{
     Symlink,
 }
 
+/// An action which can be performed with a original and new path
 pub struct Action<'a>{
     pub mode: ActionModes,
     pub orig_path: &'a Path,
@@ -14,6 +17,7 @@ pub struct Action<'a>{
 }
 
 impl<'a> Action<'a>{
+    /// Construct new action
     pub fn new(orig_path: &Path, new_name: String, mode: ActionModes) -> Action {
         Action{
             mode: mode,
@@ -21,7 +25,9 @@ impl<'a> Action<'a>{
             new_name: new_name,
         }
     }
-    pub fn perform(&self){
+
+    /// Perform given action, returning new path
+    pub fn perform(&self) -> TvnamerResult<PathBuf>{
         match self.mode{
             ActionModes::Copy => println!(
                 "Copy {:?} to {:?}", self.orig_path, self.new_name),
@@ -30,5 +36,7 @@ impl<'a> Action<'a>{
             ActionModes::Symlink => println!(
                 "Symlink from {:?} to {:?}", self.orig_path, self.new_name),
         }
+
+        Err(TvnamerError::InternalError{reason: format!("not yet implemented!")})
     }
 }
