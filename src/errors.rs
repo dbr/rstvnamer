@@ -2,10 +2,11 @@ use std::env;
 use std::fmt;
 use tvdb::TvdbError;
 
+/// All errors which may occur in the library
 #[derive(Debug)]
 pub enum TvnamerError {
     ParseError{reason: String},
-    TvdbError{original: super::TvdbError},
+    TvdbError{original: TvdbError},
     InternalError{reason: String},
     MiscError,
 }

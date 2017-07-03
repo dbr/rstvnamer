@@ -3,21 +3,20 @@ extern crate tvdb;
 
 // Loads other files
 pub mod utils;
-pub mod config;
-pub mod parsing;
-pub mod populate;
-pub mod format;
-pub mod errors;
-pub mod actions;
+mod config;
+mod parsing;
+mod populate;
+mod format;
+mod errors;
+mod actions;
 
+// Reexport public interface
 pub use errors::TvnamerError;
 pub use errors::TvnamerResult;
 
-// Reexport public interface
-pub use tvdb::TvdbResult;
-pub use tvdb::TvdbError;
-pub use parsing::parse;
-pub use populate::populate;
-pub use format::format;
 pub use actions::Action;
 pub use actions::ActionModes;
+
+pub use format::format;
+pub use parsing::parse;
+pub use populate::populate;

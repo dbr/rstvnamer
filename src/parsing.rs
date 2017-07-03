@@ -293,7 +293,7 @@ fn clean_series(name: String) -> String {
     name.replace(".", " ")
 }
 
-/// Parses a filename and returns a ParsedFile
+/// Parses a filename and returns a `ParsedFile`
 pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
     /// Check a regex contains all specified named captures
     fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool{

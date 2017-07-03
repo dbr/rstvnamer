@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use super::{TvnamerError, TvnamerResult};
 
 
-/// Different operations to perform with the new name
+/// The various operations available to perform with an `Action`
 pub enum ActionModes{
     Copy,
     Move,
