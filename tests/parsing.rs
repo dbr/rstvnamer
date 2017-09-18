@@ -2,7 +2,7 @@ extern crate rstvnamer;
 use std::path::PathBuf;
 
 #[test]
-fn test_parsing(){
+fn test_parsing() {
     let path = PathBuf::from("scrubs.s01e12.avi");
     let f = rstvnamer::parse(&path).expect("Failed to parse");
 

@@ -10,25 +10,25 @@ use super::{TvnamerError, TvnamerResult};
 
 /// Episode information prased from a filename.
 #[derive(Debug)]
-pub struct DateBased{
+pub struct DateBased {
     pub series: String,
     pub date: Date,
 }
 
 #[derive(Debug)]
-pub struct SeasonBased{
+pub struct SeasonBased {
     pub series: String,
     pub season: u32,
-    pub episode: u32
+    pub episode: u32,
 }
 
 #[derive(Debug)]
-pub enum ParsedFile{
+pub enum ParsedFile {
     Date(DateBased),
     Season(SeasonBased),
 }
 
-fn load_patterns() -> TvnamerResult<Vec<Regex>>{
+fn load_patterns() -> TvnamerResult<Vec<Regex>> {
     let raw_patterns = vec![
         // r"(?x) # [group] Show - 01-02 [crc]
         // ^\[(?P<group>.+?)\][ ]?               # group name, captured for [#100]
@@ -68,7 +68,6 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         // [\.- ]?                                 # separator
         // [Ee](?P<episodenumberend>[0-9]+))        # final episode number
         // [^\\/]*$",
-
         r"(?x) # foo.s01e23e24*
         ^((?P<seriesname>.+?)[ \._-])?          # show name
         [Ss](?P<seasonnumber>[0-9]+)             # s01
@@ -91,7 +90,6 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         // (?P=seasonnumber)                        # last season number (1)
         // [xX](?P<episodenumberend>[0-9]+))        # last episode number (x25)
         // [^\\/]*$",
-
         r"(?x) # foo.1x23x24*
         ^((?P<seriesname>.+?)[ \._-])?          # show name
         (?P<seasonnumber>[0-9]+)                 # 1
@@ -111,7 +109,8 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         )*
              [-]                                # separator
              [Ee]?(?P<episodenumberend>[0-9]+)   # final episode num
-        [\.- ]                                  # must have a separator (prevents s01e01-720p from being 720 episodes)
+        [\.- ]                                  # must have a separator
+                                                # (prevents s01e01-720p from being 720 episodes)
         [^\\/]*$",
 
         r"(?x) # foo.1x23-24*
@@ -123,7 +122,8 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         )*
              [-+]                               # separator
              (?P<episodenumberend>[0-9]+)        # final episode num
-        ([\.+ -].*                              # must have a separator (prevents 1x01-720p from being 720 episodes)
+        ([\.+ -].*                              # must have a separator
+                                                # (prevents 1x01-720p from being 720 episodes)
         |
         $)",
 
@@ -210,7 +210,6 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         // \]                                       # ]
         // .*$                                      # rest of file
         // ",
-
         r"(?x) # show name 2 of 6 - blah
         ^(?P<seriesname>.+?)                  # Show name
         [ \._-]                                 # Padding
@@ -252,7 +251,6 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         // [Ee]pisode[ ]?(?P<episodenumber>[0-9]+)   # Episode 20
         // [^\\/]*$                              # Anything
         // ",
-
         r"(?x) # foo.103*
         ^(?P<seriesname>.+)[ \._-]
         (?P<seasonnumber>[0-9]{1})
@@ -271,17 +269,19 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>>{
         [Ee](?P<episodenumber>[0-9]+)            # E123
         [\._ -][^\\/]*$                          # More padding, then anything
         ",
-
-        ];
+    ];
 
     let mut patterns: Vec<Regex> = vec![];
 
-    for pat in raw_patterns.iter(){
+    for pat in raw_patterns.iter() {
         let comp = Regex::new(pat);
         match comp {
             Ok(x) => patterns.push(x),
-            Err(e) => return Err(TvnamerError::InternalError{
-                reason: format!("Error compiling regex: {}\n  Pattern:\n{}", e, pat)}),
+            Err(e) => {
+                return Err(TvnamerError::InternalError {
+                    reason: format!("Error compiling regex: {}\n  Pattern:\n{}", e, pat),
+                })
+            }
         }
 
     }
@@ -294,12 +294,12 @@ fn clean_series(name: String) -> String {
 }
 
 /// Parses a filename and returns a `ParsedFile`
-pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
+pub fn parse(fname: &Path) -> TvnamerResult<ParsedFile> {
     /// Check a regex contains all specified named captures
-    fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool{
+    fn check_matches(cap: &regex::Captures, things: Vec<&str>) -> bool {
         let mut matches = true;
-        for name in things.iter(){
-            if cap.name(name).is_none(){
+        for name in things.iter() {
+            if cap.name(name).is_none() {
                 matches = false;
             }
         }
@@ -309,26 +309,30 @@ pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
     // Load all regex patterns
     let patterns = load_patterns()?;
 
-    let basename = Path::new(fname).file_stem()
-        .ok_or(TvnamerError::InternalError{
-            reason: format!("No file name found for path {:?}", fname)})?
-            .to_str().ok_or(TvnamerError::InternalError{
-                reason: "Failed to convert to string".into()})?;
+    let basename = Path::new(fname)
+        .file_stem()
+        .ok_or(TvnamerError::InternalError {
+            reason: format!("No file name found for path {:?}", fname),
+        })?
+        .to_str()
+        .ok_or(TvnamerError::InternalError {
+            reason: "Failed to convert to string".into(),
+        })?;
 
-    for pat in patterns.iter(){
+    for pat in patterns.iter() {
         if let Some(x) = pat.captures(basename) {
 
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
-                return Ok(ParsedFile::Season(SeasonBased{
+                return Ok(ParsedFile::Season(SeasonBased {
                     series: clean_series(x.name("seriesname").unwrap().to_owned()),
                     season: intify(x.name("seasonnumber").unwrap()),
                     episode: intify(x.name("episodenumber").unwrap()),
                 }));
 
             } else if check_matches(&x, vec!["seriesname", "year", "month", "day"]) {
-                return Ok(ParsedFile::Date(DateBased{
+                return Ok(ParsedFile::Date(DateBased {
                     series: clean_series(x.name("seriesname").unwrap().to_owned()),
-                    date: Date{
+                    date: Date {
                         year: intify(x.name("year").unwrap()),
                         month: intify(x.name("month").unwrap()),
                         day: intify(x.name("day").unwrap()),
@@ -338,16 +342,18 @@ pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
             } else {
                 // Unhandled capture groups, throw error
                 let mut names: Vec<String> = vec![];
-                for (name, _) in x.iter_named(){
+                for (name, _) in x.iter_named() {
                     names.push(name.to_owned());
                 }
-                return Err(TvnamerError::ParseError{reason:
-                    format!("Unhandled capture groups {:?} in pattern {}", names, pat)});
+                return Err(TvnamerError::ParseError {
+                    reason: format!("Unhandled capture groups {:?} in pattern {}", names, pat),
+                });
             }
         }
     }
 
     // TODO: Patterns which match against full path
-    return Err(TvnamerError::ParseError{reason:
-        format!("Unrecognised file name {} matched no patterns", basename)});
+    return Err(TvnamerError::ParseError {
+        reason: format!("Unrecognised file name {} matched no patterns", basename),
+    });
 }
