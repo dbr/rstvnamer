@@ -8,6 +8,7 @@ pub enum TvnamerError {
     ParseError{reason: String},
     TvdbError{original: TvdbError},
     InternalError{reason: String},
+    FileAlreadyExists{src: String, dest: String, action: String},
     MiscError,
 }
 
@@ -21,6 +22,8 @@ impl fmt::Display for TvnamerError {
             TvnamerError::ParseError{reason: ref e} => write!(f, "{}", e),
             TvnamerError::TvdbError{original: ref e} => write!(f, "{}", e),
             TvnamerError::InternalError{reason: ref e} => write!(f, "Internal error: {}", e),
+            TvnamerError::FileAlreadyExists {src: ref src, dest: ref dest, action: ref action} => write!(
+                f, "Cannot {} file from '{}' to destination '{}' - destination already exists", action, src, dest),
             TvnamerError::MiscError => write!(f, "Misc error"),
         }
     }

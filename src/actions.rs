@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use symlink;
 use super::{TvnamerError, TvnamerResult};
 
 
@@ -29,14 +30,28 @@ impl<'a> Action<'a>{
     /// Perform given action, returning new path
     pub fn perform(&self) -> TvnamerResult<PathBuf>{
         match self.mode{
-            ActionModes::Copy => println!(
-                "Copy {:?} to {:?}", self.orig_path, self.new_name),
-            ActionModes::Move => println!(
-                "Move!"),
-            ActionModes::Symlink => println!(
-                "Symlink from {:?} to {:?}", self.orig_path, self.new_name),
+            ActionModes::Copy => copy_file(self.orig_path, &self.new_name),
+            ActionModes::Move => move_file(self.orig_path, &self.new_name),
+            ActionModes::Symlink => symlink_file(self.orig_path, &self.new_name),
         }
-
-        Err(TvnamerError::InternalError{reason: format!("not yet implemented!")})
     }
+}
+
+
+fn symlink_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
+    println!("symlinking!");
+    symlink::symlink_file(old, new).or_else(
+        |e| Err(TvnamerError::FileAlreadyExists {src: old.to_string_lossy().into(), dest: new.clone(), action: "symlink".into()}))?;
+    let r = PathBuf::from(new);
+    Ok(r)
+}
+
+fn move_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
+    println!("moving");
+    Err(TvnamerError::InternalError {reason: format!("Not not implemented")})
+}
+
+fn copy_file(old: &Path, new: &String) -> TvnamerResult<PathBuf> {
+    println!("copying");
+    Err(TvnamerError::InternalError {reason: format!("Not not implemented")})
 }

@@ -1,5 +1,6 @@
 extern crate regex;
 extern crate tvdb;
+extern crate symlink;
 
 // Loads other files
 pub mod utils;
