@@ -1,5 +1,6 @@
 extern crate tvdb;
 use super::parsing::{SeasonBased, DateBased, ParsedFile};
+use super::config::TVDB_API_KEY;
 
 use tvdb::Date;
 use tvdb::{TvdbError, TvdbResult};
@@ -17,13 +18,13 @@ pub struct PopulatedFile {
 
 
 fn _populate_seasonbased(file: &SeasonBased) -> TvdbResult<PopulatedFile>{
-    let api = tvdb::Tvdb::new("0629B785CE550C8D");
-    let sr = try!(api.search(&file.series, "en"));
+    let api = tvdb::Tvdb::new(TVDB_API_KEY);
+    let sr = api.search(&file.series, "en")?;
     if sr.len() == 0 {
         return Err(TvdbError::SeriesNotFound);
     }
 
-    let ep = try!(api.episode(&sr[0], file.season, file.episode));
+    let ep = api.episode(&sr[0], file.season, file.episode)?;
     let sn = sr[0].seriesname.clone();
 
     let pf = PopulatedFile {

@@ -20,9 +20,9 @@ impl<'a> Action<'a>{
     /// Construct new action
     pub fn new(orig_path: &Path, new_name: String, mode: ActionModes) -> Action {
         Action{
-            mode: mode,
-            orig_path: orig_path,
-            new_name: new_name,
+            mode,
+            orig_path,
+            new_name,
         }
     }
 

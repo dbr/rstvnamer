@@ -307,7 +307,7 @@ pub fn parse(fname:&Path) -> TvnamerResult<ParsedFile>{
     }
 
     // Load all regex patterns
-    let patterns = try!(load_patterns());
+    let patterns = load_patterns()?;
 
     let basename = Path::new(fname).file_stem()
         .ok_or(TvnamerError::InternalError{
