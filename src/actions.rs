@@ -39,16 +39,19 @@ impl<'a> Action<'a> {
 
 
 fn symlink_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
-    symlink::symlink_file(old, new).or_else(|e| {
+    let parent = old.parent().unwrap();
+    let new_filepath = parent.join(new);
+
+    symlink::symlink_file(&old, &new_filepath).or_else(|e| {
         Err(TvnamerError::FileAlreadyExists {
             src: old.to_string_lossy().into(),
-            dest: new.clone(),
+            dest: new_filepath.to_string_lossy().into(),
             action: "symlink".into(),
             reason: format!("{}", e),
         })
     })?;
-    let r = PathBuf::from(new);
-    Ok(r)
+
+    Ok(new_filepath)
 }
 
 fn move_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
