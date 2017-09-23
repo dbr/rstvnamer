@@ -12,6 +12,7 @@ pub enum TvnamerError {
         src: String,
         dest: String,
         action: String,
+        reason: String
     },
     MiscError,
 }
@@ -30,13 +31,15 @@ impl fmt::Display for TvnamerError {
                 ref src,
                 ref dest,
                 ref action,
+                ref reason,
             } => {
                 write!(
                     f,
-                    "Cannot {} file from '{}' to destination '{}' - destination already exists",
+                    "Cannot {} file from '{}' to destination '{}': {}",
                     action,
                     src,
-                    dest
+                    dest,
+                    reason,
                 )
             }
             TvnamerError::MiscError => write!(f, "Misc error"),

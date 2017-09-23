@@ -39,12 +39,12 @@ impl<'a> Action<'a> {
 
 
 fn symlink_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
-    println!("symlinking!");
     symlink::symlink_file(old, new).or_else(|e| {
         Err(TvnamerError::FileAlreadyExists {
             src: old.to_string_lossy().into(),
             dest: new.clone(),
             action: "symlink".into(),
+            reason: format!("{}", e),
         })
     })?;
     let r = PathBuf::from(new);
