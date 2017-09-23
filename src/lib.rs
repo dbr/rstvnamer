@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate log;
 extern crate regex;
 extern crate tvdb;
 extern crate symlink;

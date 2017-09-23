@@ -39,6 +39,7 @@ impl<'a> Action<'a> {
 
 
 fn symlink_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
+    debug!("Symlinking {:?} with new name {:?}", old, new);
     let parent = old.parent().unwrap();
     let new_filepath = parent.join(new);
 
