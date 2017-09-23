@@ -40,9 +40,9 @@ fn _populate_seasonbased(file: &SeasonBased) -> TvnamerResult<PopulatedFile> {
 }
 
 fn _populate_datebased(file: &DateBased) -> TvnamerResult<PopulatedFile> {
-    Err(TvdbError::CommunicationError {
-        reason: "Because testing".to_string(),
-    }.into())
+    Err(
+        TvdbError::CommunicationError { reason: "Because testing".to_string() }.into(),
+    )
 }
 
 /// Takes a ParsedFile, locates additional information (episode name

@@ -12,7 +12,7 @@ pub enum TvnamerError {
         src: String,
         dest: String,
         action: String,
-        reason: String
+        reason: String,
     },
     MiscError,
 }
