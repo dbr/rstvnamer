@@ -17,10 +17,11 @@ fn process_one(path: &Path) -> TvnamerResult<PathBuf> {
     let populated = rstvnamer::populate(&parsed)?;
     debug!("Populated: {:?}", populated);
 
-    let formatted = rstvnamer::format(&populated, &parsed, &path)?;
+    let formatted = rstvnamer::format(&populated, &parsed, path)?;
     debug!("Formatted {:?}", formatted);
 
-    let act = rstvnamer::Action::new(&path, formatted, rstvnamer::ActionModes::Symlink);
+    let act = rstvnamer::Action::new(path, formatted, rstvnamer::ActionModes::Symlink);
+
     return act.perform();
 }
 
@@ -43,17 +44,9 @@ fn main() {
 
     let args: Vec<&str> = matches.values_of("files").unwrap().collect();
 
-
-    /*
-    let result = args.iter().map(Path::new)
-        .map(rstvnamer::parse)
-        .map(|x| rstvnamer::populate(&x?))
-        .collect::<Vec<TvnamerResult<rstvnamer::PopulatedFile>>>();
-     */
-
     for fname in args {
         println!("# Processing: {}", fname);
-        match process_one(&Path::new(&fname)) {
+        match process_one(Path::new(&fname)) {
             Ok(_) => (),
             Err(e) => println!("Error with {}: {}", fname, e),
         };

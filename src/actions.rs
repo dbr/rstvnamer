@@ -58,13 +58,13 @@ fn symlink_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
 fn move_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
     println!("moving");
     Err(TvnamerError::InternalError {
-        reason: format!("Not not implemented"),
+        reason: "Not not implemented".into(),
     })
 }
 
 fn copy_file(old: &Path, new: &String) -> TvnamerResult<PathBuf> {
     println!("copying");
     Err(TvnamerError::InternalError {
-        reason: format!("Not not implemented"),
+        reason: "Not not implemented".into(),
     })
 }

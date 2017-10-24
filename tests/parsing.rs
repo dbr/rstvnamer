@@ -7,9 +7,9 @@ fn test_parsing() {
     let f = rstvnamer::parse(&path).expect("Failed to parse");
 
     if let rstvnamer::ParsedFile::Season(x) = f {
-        assert!(x.series == "scrubs");
-        assert!(x.season == 1);
-        assert!(x.episode == 12);
+        assert_eq!(x.series, "scrubs");
+        assert_eq!(x.season, 1);
+        assert_eq!(x.episode, 12);
     } else {
         panic!("Wrong parsed file type {:?}", f)
     }

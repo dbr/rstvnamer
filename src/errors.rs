@@ -1,4 +1,3 @@
-use std::env;
 use std::fmt;
 use tvdb::TvdbError;
 

@@ -1,6 +1,6 @@
 use super::populate::PopulatedFile;
 use super::parsing::ParsedFile;
-use tvdb::{TvdbError, TvdbResult};
+use tvdb::TvdbResult;
 use std::path::Path;
 
 fn ext(path: &Path) -> String {
