@@ -31,8 +31,8 @@ pub enum ParsedFile {
 fn load_patterns() -> TvnamerResult<Vec<Regex>> {
     let raw_patterns = vec![
         // r"(?x) # [group] Show - 01-02 [crc]
-        // ^\[(?P<group>.+?)\][ ]?               # group name, captured for [#100]
-        // (?P<seriesname>.*?)[ ]?[-_][ ]?          # show name, padding, spaces?
+        // ^\[(?P<group>.+?)\][\x20]?               # group name, captured for [#100]
+        // (?P<seriesname>.*?)[\x20]?[-_][\x20]?          # show name, padding, spaces?
         // (?P<episodenumberstart>\d+)              # first episode number
         // ([-_]\d+)*                               # optional repeating episodes
         // [-_](?P<episodenumberend>\d+)            # last episode number
@@ -43,9 +43,9 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         // [^/]*$",
 
         // r"(?x) # [group] Show - 01 [crc]
-        // ^\[(?P<group>.+?)\][ ]?               # group name, captured for [#100]
+        // ^\[(?P<group>.+?)\][\x20]?               # group name, captured for [#100]
         // (?P<seriesname>.*)                       # show name
-        // [ ]?[-_][ ]?                             # padding and seperator
+        // [\x20]?[-_][\x20]?                             # padding and seperator
         // (?P<episodenumber>\d+)                   # episode number
         // (?=                                      # Optional group for crc value (non-capturing)
         //   .*                                     # padding
@@ -68,6 +68,7 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         // [\.- ]?                                 # separator
         // [Ee](?P<episodenumberend>[0-9]+))        # final episode number
         // [^\\/]*$",
+
         r"(?x) # foo.s01e23e24*
         ^((?P<seriesname>.+?)[ \._-])?          # show name
         [Ss](?P<seasonnumber>[0-9]+)             # s01
@@ -78,7 +79,6 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         [\.- ]?[Ee](?P<episodenumberend>[0-9]+) # final episode num
         [^/]*$",
 
-        // FIXME: Disabled because of (?P=blah ) syntax
         // r"(?x) # foo.1x23 1x24 1x25
         // ^((?P<seriesname>.+?)[ \._-])?          # show name
         // (?P<seasonnumber>[0-9]+)                 # first season number (1)
@@ -90,6 +90,7 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         // (?P=seasonnumber)                        # last season number (1)
         // [xX](?P<episodenumberend>[0-9]+))        # last episode number (x25)
         // [^\\/]*$",
+
         r"(?x) # foo.1x23x24*
         ^((?P<seriesname>.+?)[ \._-])?          # show name
         (?P<seasonnumber>[0-9]+)                 # 1
@@ -163,9 +164,9 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         [^\\/]*$",
 
         r"(?x) # foo.s01.e01, foo.s01_e01, foo.s01 - e01
-        ^((?P<seriesname>.+?)[ \._-])?
+        ^((?P<seriesname>.+?)[ ._-])?
         \[?
-        [Ss](?P<seasonnumber>[0-9]+)[ ]?[\._- ]?[ ]?
+        [Ss](?P<seasonnumber>[0-9]+)[\x20]?[._- ]?[\x20]? # space
         [Ee]?(?P<episodenumber>[0-9]+)
         \]?
         [^\\/]*$",
@@ -190,26 +191,25 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         [ \._-]?                                # padding
         [^\\/]*$",
 
-        // FIXME: Strange error with mismatched parens?
-        // r"(?x) # Foo - S2 E 02 - etc
-        // ^(?P<seriesname>.+?)[ ]?[ \._-][ ]?
-        // [Ss](?P<seasonnumber>[0-9]+)[\.- ]?
-        // [Ee]?[ ]?(?P<episodenumber>[0-9]+)
-        // [^\\/]*$",
+        r"(?x) # Foo - S2 E 02 - etc
+        ^(?P<seriesname>.+?)[\x20]?[ \._-][\x20]?
+        [Ss](?P<seasonnumber>[0-9]+)[\.- ]?
+        [Ee]?[\x20]?(?P<episodenumber>[0-9]+)
+        [^\\/]*$",
 
-        // FIXME: Confused syntax for [] stuff
-        // r"(?x) # Show - Episode 9999 [S 12 - Ep 131] - etc
-        // (?P<seriesname>.+)                       # Showname
-        // [ ]-[ ]                                  # -
-        // [Ee]pisode[ ]\d+                         # Episode 1234 (ignored)
-        // [ ]
-        // \[                                       # [
-        // [sS][ ]?(?P<seasonnumber>\d+)            # s 12
-        // ([ ]|[ ]-[ ]|-)                          # space, or -
-        // ([eE]|[eE]p)[ ]?(?P<episodenumber>\d+)   # e or ep 12
-        // \]                                       # ]
-        // .*$                                      # rest of file
-        // ",
+        r"(?x) # Show - Episode 9999 [S 12 - Ep 131] - etc
+        (?P<seriesname>.+)                       # Showname
+        [\x20]-[\x20]                                  # -
+        [Ee]pisode[\x20]\d+                         # Episode 1234 (ignored)
+        [\x20]
+        \[                                       # [
+        [sS][\x20]?(?P<seasonnumber>\d+)            # s 12
+        ([\x20]|[\x20]-[\x20]|-)                          # space, or -
+        ([eE]|[eE]p)[\x20]?(?P<episodenumber>\d+)   # e or ep 12
+        \]                                       # ]
+        .*$                                      # rest of file
+        ",
+
         r"(?x) # show name 2 of 6 - blah
         ^(?P<seriesname>.+?)                  # Show name
         [ \._-]                                 # Padding
@@ -236,21 +236,20 @@ fn load_patterns() -> TvnamerResult<Vec<Regex>> {
         [\._ -][^\\/]*$                            # More padding, then anything
         ",
 
-        // FIXME: ANother paren problem
-        // r"(?x) # Show.Name.Part1
-        // ^(?P<seriesname>.+?)                  # Show name\n
-        // [ \._-]                               # Padding\n
-        // [Pp]art[ ](?P<episodenumber>[0-9]+)      # Part 1\n
-        // [\\._ -][^\\/]*$                         # More padding, then anything\n
-        // ",
+        r"(?x) # Show.Name.Part1
+        ^(?P<seriesname>.+?)                  # Show name\n
+        [ \._-]                               # Padding\n
+        [Pp]art[\x20](?P<episodenumber>[0-9]+)      # Part 1\n
+        [\\._ -][^\\/]*$                         # More padding, then anything\n
+        ",
 
-        // FIXME: ANother paren problem
-        // r"(?x) # show name Season 01 Episode 20
-        // ^(?P<seriesname>.+?)[ ]?               # Show name
-        // [Ss]eason[ ]?(?P<seasonnumber>[0-9]+)[ ]? # Season 1
-        // [Ee]pisode[ ]?(?P<episodenumber>[0-9]+)   # Episode 20
-        // [^\\/]*$                              # Anything
-        // ",
+        r"(?x) # show name Season 01 Episode 20
+        ^(?P<seriesname>.+?)[\x20]?               # Show name
+        [Ss]eason[\x20]?(?P<seasonnumber>[0-9]+)[\x20]? # Season 1
+        [Ee]pisode[\x20]?(?P<episodenumber>[0-9]+)   # Episode 20
+        [^\\/]*$                              # Anything
+        ",
+
         r"(?x) # foo.103*
         ^(?P<seriesname>.+)[ \._-]
         (?P<seasonnumber>[0-9]{1})
@@ -324,27 +323,24 @@ pub fn parse(fname: &Path) -> TvnamerResult<ParsedFile> {
 
             if check_matches(&x, vec!["seriesname", "seasonnumber", "episodenumber"]) {
                 return Ok(ParsedFile::Season(SeasonBased {
-                    series: clean_series(x.name("seriesname").unwrap().to_owned()),
-                    season: intify(x.name("seasonnumber").unwrap()),
-                    episode: intify(x.name("episodenumber").unwrap()),
+                    series: clean_series(x.name("seriesname").unwrap().as_str().into()),
+                    season: intify(x.name("seasonnumber").unwrap().as_str()),
+                    episode: intify(x.name("episodenumber").unwrap().as_str()),
                 }));
 
             } else if check_matches(&x, vec!["seriesname", "year", "month", "day"]) {
                 return Ok(ParsedFile::Date(DateBased {
-                    series: clean_series(x.name("seriesname").unwrap().to_owned()),
+                    series: clean_series(x.name("seriesname").unwrap().as_str().into()),
                     date: Date {
-                        year: intify(x.name("year").unwrap()),
-                        month: intify(x.name("month").unwrap()),
-                        day: intify(x.name("day").unwrap()),
+                        year: intify(x.name("year").unwrap().as_str().into()),
+                        month: intify(x.name("month").unwrap().as_str().into()),
+                        day: intify(x.name("day").unwrap().as_str().into()),
                     },
                 }));
 
             } else {
                 // Unhandled capture groups, throw error
-                let mut names: Vec<String> = vec![];
-                for (name, _) in x.iter_named() {
-                    names.push(name.to_owned());
-                }
+                let names = pat.capture_names().collect::<Vec<Option<&str>>>();
                 return Err(TvnamerError::ParseError {
                     reason: format!("Unhandled capture groups {:?} in pattern {}", names, pat),
                 });
