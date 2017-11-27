@@ -12,7 +12,7 @@ fn ext(path: &Path) -> String {
 /// Construct a new path
 pub fn format(
     populated: &PopulatedFile,
-    parsed: &ParsedFile,
+    _parsed: &ParsedFile,
     original: &Path,
 ) -> TvdbResult<String> {
     let extension = ext(original);

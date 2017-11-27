@@ -1,10 +1,10 @@
 extern crate tvdb;
-use super::parsing::{SeasonBased, DateBased, ParsedFile};
+use super::parsing::{DateBased, ParsedFile, SeasonBased};
 use super::config::TVDB_API_KEY;
 use super::errors::TvnamerResult;
 
 use tvdb::Date;
-use tvdb::{TvdbError, TvdbResult};
+use tvdb::TvdbError;
 
 /// Episode with complete set of information, usually expanded from a
 /// ParsedFile instance
@@ -41,15 +41,15 @@ fn _populate_seasonbased(file: &SeasonBased) -> TvnamerResult<PopulatedFile> {
 
 fn _populate_datebased(file: &DateBased) -> TvnamerResult<PopulatedFile> {
     Err(
-        TvdbError::CommunicationError { reason: "Because testing".to_string() }.into(),
+        TvdbError::CommunicationError { reason: "Because testing".into() }.into(),
     )
 }
 
 /// Takes a `ParsedFile`, locates additional information (episode name
 /// etc) and returns a complete `PopulatedFile` instance
 pub fn populate(f: &ParsedFile) -> TvnamerResult<PopulatedFile> {
-    return match f {
-        &ParsedFile::Date(ref x) => return _populate_datebased(&x),
-        &ParsedFile::Season(ref x) => return _populate_seasonbased(&x),
-    };
+    match f {
+        &ParsedFile::Date(ref x) => _populate_datebased(&x),
+        &ParsedFile::Season(ref x) => _populate_seasonbased(&x),
+    }
 }
