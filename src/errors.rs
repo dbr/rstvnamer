@@ -1,50 +1,29 @@
-use std::fmt;
 use tvdb::TvdbError;
 
+
 /// All errors which may occur in the library
-#[derive(Debug)]
+#[derive(Fail, Debug)]
 pub enum TvnamerError {
+    #[fail(display = "failed to parse: {}", reason)]
     ParseError { reason: String },
-    TvdbError { original: TvdbError },
+    #[fail(display = "error from TheTVDB: {:?}", original)]
+    TvdbError { #[cause] original: TvdbError },
+    #[fail(display = "internal library error from tvdb-rs: {:?}", reason)]
     InternalError { reason: String },
+    #[fail(display = "cannot {} file from source {} to destination {}: {}", action, src, dest, reason)]
     FileAlreadyExists {
         src: String,
         dest: String,
         action: String,
         reason: String,
     },
+    #[fail(display = "misc error")]
     MiscError,
 }
 
 /// Shortcut
 pub type TvnamerResult<T> = Result<T, TvnamerError>;
 
-// Formatting for error
-impl fmt::Display for TvnamerError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            TvnamerError::ParseError { ref reason } => write!(f, "{}", reason),
-            TvnamerError::TvdbError { ref original } => write!(f, "{}", original),
-            TvnamerError::InternalError { ref reason } => write!(f, "Internal error: {}", reason),
-            TvnamerError::FileAlreadyExists {
-                ref src,
-                ref dest,
-                ref action,
-                ref reason,
-            } => {
-                write!(
-                    f,
-                    "Cannot {} file from '{}' to destination '{}': {}",
-                    action,
-                    src,
-                    dest,
-                    reason,
-                )
-            }
-            TvnamerError::MiscError => write!(f, "Misc error"),
-        }
-    }
-}
 
 impl From<TvdbError> for TvnamerError {
     fn from(err: TvdbError) -> TvnamerError {

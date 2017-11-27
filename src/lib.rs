@@ -1,8 +1,9 @@
-#[macro_use]
-extern crate log;
+#[macro_use] extern crate log;
 extern crate regex;
 extern crate tvdb;
 extern crate symlink;
+extern crate failure;
+#[macro_use] extern crate failure_derive;
 
 // Loads other files
 pub mod utils;
