@@ -2,11 +2,15 @@ use regex::Regex;
 use regex;
 use std::path::Path;
 
-use tvdb::Date;
 use super::utils::intify;
 use super::{TvnamerError, TvnamerResult};
 
-
+#[derive(Debug)]
+pub struct Date{
+    pub year: u32,
+    pub month: u32,
+    pub day: u32,
+}
 
 /// Episode information prased from a filename.
 #[derive(Debug)]

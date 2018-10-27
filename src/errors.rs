@@ -8,6 +8,8 @@ pub enum TvnamerError {
     ParseError { reason: String },
     #[fail(display = "error from TheTVDB: {:?}", original)]
     TvdbError { #[cause] original: TvdbError },
+    #[fail(display = "failed to find {}", what)]
+    EpisodeNotFound { what: String },
     #[fail(display = "internal library error from tvdb-rs: {:?}", reason)]
     InternalError { reason: String },
     #[fail(display = "cannot {} file from source {} to destination {}: {}", action, src, dest, reason)]
