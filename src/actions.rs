@@ -5,9 +5,17 @@ use super::{TvnamerError, TvnamerResult};
 
 /// The various operations available to perform with an `Action`
 pub enum ActionModes {
+    /// Copy original file to new file with corrected name
     Copy,
+
+    /// Move original file to corrected name
     Move,
+
+    /// Create symlink with corrected name
     Symlink,
+
+    /// Move file to new new name, leave a symlink at original location
+    MoveAndLink,
 }
 
 /// An action which can be performed with a original and new path
@@ -33,6 +41,7 @@ impl<'a> Action<'a> {
             ActionModes::Copy => copy_file(self.orig_path, &self.new_name),
             ActionModes::Move => move_file(self.orig_path, &self.new_name),
             ActionModes::Symlink => symlink_file(self.orig_path, &self.new_name),
+            ActionModes::MoveAndLink => move_and_link_file(self.orig_path, &self.new_name),
         }
     }
 }
@@ -64,6 +73,14 @@ fn move_file(old: &Path, new: &String) -> TvnamerResult<(PathBuf)> {
 
 fn copy_file(old: &Path, new: &String) -> TvnamerResult<PathBuf> {
     println!("Copying {:?} to {:?}", old, new);
+    Err(TvnamerError::InternalError {
+        reason: "Not not implemented".into(),
+    })
+}
+
+fn move_and_link_file(old: &Path, new: &String) -> TvnamerResult<PathBuf> {
+    println!("Moving {:?} to {:?}", old, new);
+    println!("Making link at {:?} pointing to {:?}", old, new);
     Err(TvnamerError::InternalError {
         reason: "Not not implemented".into(),
     })
