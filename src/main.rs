@@ -29,7 +29,7 @@ fn process_one(path: &Path) -> TvnamerResult<PathBuf> {
 #[cfg(not(test))]
 #[cfg(not(doc))]
 fn main() {
-    env_logger::init().expect("Failed to setup env_logger");
+    env_logger::init();
 
     let matches = App::new("tvnamer")
         .about("Automatic TV episode namer")
